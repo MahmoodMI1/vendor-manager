@@ -1,0 +1,25 @@
+# Generated files
+config.json
+log.txt
+
+# Token cache
+tokens/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Environment
+.env
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
