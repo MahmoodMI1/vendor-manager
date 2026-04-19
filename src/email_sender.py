@@ -1,9 +1,11 @@
-import requests
+import smtplib
+from email.mime.text import MIMEText
 
-GRAPH_SEND_URL = "https://graph.microsoft.com/v1.0/me/sendMail"
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
 
 
-def format_email(vendor_name: str, visit_date: str, sender_name: str, recipient_email: str) -> dict:
+def format_email(vendor_name: str, visit_date: str, sender_name: str, sender_email: str, recipient_email: str) -> dict:
     subject = f"Reminder: Vendor Visit Tomorrow — {vendor_name}"
     body = (
         f"Hi {vendor_name},\n\n"
@@ -13,37 +15,26 @@ def format_email(vendor_name: str, visit_date: str, sender_name: str, recipient_
         f"{sender_name}"
     )
 
-    graph_payload = {
-        "message": {
-            "subject": subject,
-            "body": {
-                "contentType": "Text",
-                "content": body,
-            },
-            "toRecipients": [
-                {
-                    "emailAddress": {
-                        "address": recipient_email,
-                    }
-                }
-            ],
-        }
-    }
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = sender_email
+    msg["To"] = recipient_email
 
     return {
         "subject": subject,
         "body": body,
         "recipient": recipient_email,
-        "graph_payload": graph_payload,
+        "mime_message": msg,
     }
 
 
-def send_email(graph_payload: dict, headers: dict) -> dict:
+def send_email(mime_message: MIMEText, sender_email: str, app_password: str) -> dict:
     try:
-        response = requests.post(GRAPH_SEND_URL, json=graph_payload, headers=headers)
-        if response.status_code == 202:
-            return {"success": True, "status_code": 202}
-        else:
-            return {"success": False, "status_code": response.status_code, "error": response.text}
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.send_message(mime_message)
+        server.quit()
+        return {"success": True}
     except Exception as e:
-        return {"success": False, "status_code": None, "error": str(e)}
+        return {"success": False, "error": str(e)}
