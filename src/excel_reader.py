@@ -1,6 +1,13 @@
 import openpyxl
 from datetime import date, datetime
 
+# --- COLUMN HEADERS (edit these to match the customer's Excel) ---
+SCHEDULE_NAME_HEADER = "Vendor Name"
+SCHEDULE_DATE_HEADER = "Visit Date"
+DIRECTORY_NAME_HEADER = "Vendor Name"
+DIRECTORY_EMAIL_HEADER = "Email"
+# -----------------------------------------------------------------
+
 
 def _normalize_date(value) -> date | None:
     if value is None:
@@ -25,19 +32,36 @@ def _normalize_date(value) -> date | None:
     return None
 
 
+def _find_columns(sheet, headers: list[str]) -> dict[str, int]:
+    first_row = next(sheet.iter_rows(min_row=1, max_row=1, values_only=True))
+    mapping = {}
+    for target in headers:
+        for i, cell in enumerate(first_row):
+            if cell and str(cell).strip().lower() == target.lower():
+                mapping[target] = i
+                break
+        if target not in mapping:
+            raise ValueError(f'Column "{target}" not found. Found: {[str(c) for c in first_row if c]}')
+    return mapping
+
+
 def read_schedule(path: str) -> list[dict]:
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb.active
-    rows = []
 
-    header_skipped = False
+    cols = _find_columns(ws, [SCHEDULE_NAME_HEADER, SCHEDULE_DATE_HEADER])
+    name_idx = cols[SCHEDULE_NAME_HEADER]
+    date_idx = cols[SCHEDULE_DATE_HEADER]
+
+    rows = []
+    first = True
     for row in ws.iter_rows(values_only=True):
-        if not header_skipped:
-            header_skipped = True
+        if first:
+            first = False
             continue
 
-        name = row[0]
-        raw_date = row[1]
+        name = row[name_idx] if name_idx < len(row) else None
+        raw_date = row[date_idx] if date_idx < len(row) else None
 
         if not name or not str(name).strip():
             continue
@@ -58,16 +82,20 @@ def read_schedule(path: str) -> list[dict]:
 def read_directory(path: str) -> list[dict]:
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb.active
-    rows = []
 
-    header_skipped = False
+    cols = _find_columns(ws, [DIRECTORY_NAME_HEADER, DIRECTORY_EMAIL_HEADER])
+    name_idx = cols[DIRECTORY_NAME_HEADER]
+    email_idx = cols[DIRECTORY_EMAIL_HEADER]
+
+    rows = []
+    first = True
     for row in ws.iter_rows(values_only=True):
-        if not header_skipped:
-            header_skipped = True
+        if first:
+            first = False
             continue
 
-        name = row[0]
-        email = row[1]
+        name = row[name_idx] if name_idx < len(row) else None
+        email = row[email_idx] if email_idx < len(row) else None
 
         if not name or not str(name).strip():
             continue

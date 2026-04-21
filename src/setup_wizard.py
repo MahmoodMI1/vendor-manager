@@ -6,7 +6,7 @@ from config_manager import save_config
 def run_setup():
     root = tk.Tk()
     root.title("Vendor Reminder — Setup")
-    root.geometry("500x400")
+    root.geometry("500x650")
     root.resizable(False, False)
 
     paths = {"schedule": "", "directory": ""}
