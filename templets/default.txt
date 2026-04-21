@@ -1,0 +1,10 @@
+Subject: Reminder: Vendor Visit Tomorrow — {vendor_name}
+
+Hi {vendor_name},
+
+This is a reminder that your visit is scheduled for tomorrow, {visit_date}.
+
+Please don't hesitate to reach out if you have any questions.
+
+Best regards,
+{sender_name}
