@@ -1,7 +1,8 @@
 import json
 import os
+from src.paths import get_root
 
-DEFAULT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+DEFAULT_PATH = os.path.join(get_root(), "config.json")
 
 
 def save_config(config: dict, path: str = DEFAULT_PATH) -> None:

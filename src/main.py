@@ -2,12 +2,15 @@ import logging
 import os
 from datetime import date, timedelta
 
+from src.paths import get_root
 from src.config_manager import load_config
-from src.auth import get_credentials
+from src.auth import get_credentials, get_headers
 from src.excel_reader import read_schedule, read_directory, get_visits_for_date, lookup_vendor_email
-from src.email_sender import format_email, send_email
+from src.email_sender import format_email, send_email_gmail, send_email_outlook
 
-LOG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "log.txt")
+ROOT = get_root()
+LOG_PATH = os.path.join(ROOT, "log.txt")
+PAUSE_FILE = os.path.join(ROOT, "PAUSED")
 
 logging.basicConfig(
     filename=LOG_PATH,
@@ -20,17 +23,31 @@ logging.basicConfig(
 def run():
     logging.info("Running vendor reminder check...")
 
+    if os.path.exists(PAUSE_FILE):
+        logging.info("Reminders are paused. Skipping.")
+        return
+
     try:
         config = load_config()
     except FileNotFoundError:
         logging.error("config.json not found. Run setup_wizard first.")
         return
 
-    try:
-        credentials = get_credentials()
-    except Exception as e:
-        logging.error(f"Failed to load credentials: {e}")
-        return
+    email_mode = config.get("email_mode", "gmail")
+    logging.info(f"Email mode: {email_mode}")
+
+    if email_mode == "outlook":
+        try:
+            headers = get_headers()
+        except Exception as e:
+            logging.error(f"Outlook auth failed: {e}")
+            return
+    else:
+        try:
+            credentials = get_credentials()
+        except Exception as e:
+            logging.error(f"Failed to load Gmail credentials: {e}")
+            return
 
     tomorrow = date.today() + timedelta(days=1)
     logging.info(f"Tomorrow is {tomorrow}")
@@ -67,20 +84,23 @@ def run():
             vendor_name=vendor_name,
             visit_date=str(tomorrow),
             sender_name=config["sender_name"],
-            sender_email=credentials["email"],
+            sender_email=config.get("sender_email", ""),
             recipient_email=email_address,
         )
 
-        result = send_email(
-            mime_message=email["mime_message"],
-            sender_email=credentials["email"],
-            app_password=credentials["app_password"],
-        )
+        if email_mode == "outlook":
+            result = send_email_outlook(email["graph_payload"], headers)
+        else:
+            result = send_email_gmail(
+                mime_message=email["mime_message"],
+                sender_email=credentials["email"],
+                app_password=credentials["app_password"],
+            )
 
         if result["success"]:
             logging.info(f"EMAIL SENT — {vendor_name} ({email_address})")
         else:
-            logging.error(f"FAILED — {vendor_name} ({email_address}): {result['error']}")
+            logging.error(f"FAILED — {vendor_name} ({email_address}): {result.get('error', 'Unknown')}")
 
     logging.info("Done.")
 

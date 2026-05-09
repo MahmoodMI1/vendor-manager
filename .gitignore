@@ -5,6 +5,9 @@ log.txt
 # Token cache
 tokens/
 
+# Control panel
+PAUSED
+
 # Python
 __pycache__/
 *.pyc
