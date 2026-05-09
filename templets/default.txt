@@ -1,3 +1,4 @@
+
 Subject: Reminder: Vendor Visit Tomorrow — {vendor_name}
 
 Hi {vendor_name},

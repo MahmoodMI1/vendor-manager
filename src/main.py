@@ -2,10 +2,10 @@ import logging
 import os
 from datetime import date, timedelta
 
-from src.config_manager import load_config
-from src.auth import get_credentials, get_headers
-from src.excel_reader import read_schedule, read_directory, get_visits_for_date, lookup_vendor_email
-from src.email_sender import format_email, send_email_gmail, send_email_outlook
+from .config_manager import load_config
+from .auth import get_credentials, get_headers
+from .excel_reader import read_schedule, read_directory, get_visits_for_date, lookup_vendor_email
+from .email_sender import format_email, send_email_gmail, send_email_outlook
 
 LOG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "log.txt")
 
