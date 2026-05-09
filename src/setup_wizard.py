@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from .config_manager import save_config
+from src.config_manager import save_config
 
 
 def run_setup():

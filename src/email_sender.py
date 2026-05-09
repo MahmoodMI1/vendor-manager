@@ -2,11 +2,12 @@ import smtplib
 import requests
 import os
 from email.mime.text import MIMEText
+from src.paths import get_root
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 GRAPH_SEND_URL = "https://graph.microsoft.com/v1.0/me/sendMail"
-DEFAULT_TEMPLATE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates", "default.txt")
+DEFAULT_TEMPLATE = os.path.join(get_root(), "templates", "default.txt")
 
 
 def load_template(path: str = DEFAULT_TEMPLATE) -> dict:

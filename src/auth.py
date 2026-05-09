@@ -1,10 +1,11 @@
 import os
 import json
 import msal
-from .config_manager import load_config
+from src.config_manager import load_config
+from src.paths import get_root
 
 SCOPES = ["Mail.Send"]
-TOKEN_CACHE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tokens", "token_cache.json")
+TOKEN_CACHE_PATH = os.path.join(get_root(), "tokens", "token_cache.json")
 
 
 def _get_cache() -> msal.SerializableTokenCache:

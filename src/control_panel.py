@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import messagebox, scrolledtext
 import os
 import threading
-from .main import run
+from src.paths import get_root
+from src.main import run
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
-PAUSE_FILE = os.path.join(PROJECT_ROOT, "PAUSED")
-LOG_PATH = os.path.join(PROJECT_ROOT, "log.txt")
+ROOT = get_root()
+PAUSE_FILE = os.path.join(ROOT, "PAUSED")
+LOG_PATH = os.path.join(ROOT, "log.txt")
 
 
 class ControlPanel:
