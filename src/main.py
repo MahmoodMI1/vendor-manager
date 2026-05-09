@@ -20,6 +20,11 @@ logging.basicConfig(
 def run():
     logging.info("Running vendor reminder check...")
 
+    pause_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), "PAUSED")
+    if os.path.exists(pause_file):
+        logging.info("Reminders are paused. Skipping.")
+        return
+
     try:
         config = load_config()
     except FileNotFoundError:
