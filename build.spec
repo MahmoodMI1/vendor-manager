@@ -64,6 +64,3 @@ setup_exe = EXE(setup_pyz, setup.scripts, setup.binaries, setup.datas,
     icon=None,
 )
 
-COLLECT(control_exe, control_panel.binaries, control_panel.datas, strip=False, upx=True, name='VendorReminder')
-COLLECT(runner_exe, runner.binaries, runner.datas, strip=False, upx=True, name='VendorReminderRunner')
-COLLECT(setup_exe, setup.binaries, setup.datas, strip=False, upx=True, name='VendorReminderSetup')
